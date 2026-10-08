@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semio Millonario 🩺💰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover:not(:disabled) {
+            transform: scale(1.01);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between font-sans">
+
+    <!-- Header / Título -->
+    <header class="w-full py-4 bg-slate-900 border-b border-purple-900/50 text-center shadow-lg">
+        <h1 class="text-2xl font-bold tracking-wider text-purple-400">¿Quién Quiere Ser Semio-Millonario? 🩺🧠</h1>
+        <p class="text-xs text-slate-400 mt-1">Pon a prueba tu agudeza clínica</p>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="max-w-4xl w-full mx-auto p-4 flex flex-col md:flex-row gap-6 my-auto">
+        
+        <!-- Área de Pregunta y Opciones -->
+        <div class="flex-1 flex flex-col justify-between bg-slate-900/80 border border-slate-800 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
+            
+            <!-- Comodines -->
+            <div class="flex justify-center gap-4 mb-6">
+                <button onclick="usarComodín50()" id="btn-50" class="px-4 py-2 bg-purple-900/40 border border-purple-500/50 rounded-xl text-sm font-semibold text-purple-300 hover:bg-purple-800/50 transition">
+                    50:50
+                </button>
+                <button onclick="usarComodínPista()" id="btn-pista" class="px-4 py-2 bg-purple-900/40 border border-purple-500/50 rounded-xl text-sm font-semibold text-purple-300 hover:bg-purple-800/50 transition">
+                    💡 Pista Clínica
+                </button>
+            </div>
+
+            <!-- Pregunta -->
+            <div class="mb-8">
+                <span id="question-number" class="text-xs font-bold tracking-widest text-purple-400 uppercase">Pregunta 1</span>
+                <h2 id="question-text" class="text-lg md:text-xl font-medium mt-2 text-slate-100">Cargando pregunta...</h2>
+            </div>
+
+            <!-- Opciones -->
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Se inyectan con JS -->
+            </div>
+        </div>
+
+        <!-- Panel lateral: Escalafón de Premios / Niveles -->
+        <div class="w-full md:w-64 bg-slate-900/80 border border-slate-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 text-center">Escalafón Clínico</h3>
+            <ul id="prize-list" class="flex flex-col-reverse gap-1.5 text-sm">
+                <!-- Se generan dinámicamente -->
+            </ul>
+            <div id="game-status" class="mt-4 text-center text-xs text-purple-300 font-semibold"></div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-4 text-xs text-slate-500">
+        Desarrollado con fines educativos y clínicos ⚡
+    </footer>
+
+    <!-- Lógica del Juego -->
+    <script>
+        const preguntas = [
+            {
+                pregunta: "¿El edema de origen cardiovascular se caracteriza clásicamente por ser de tipo:",
+                opciones: [
+                    "Matutino y blando",
+                    "Vespertino, simétrico y de fácil fóvea",
+                    "Unilateral, duro e indoloro",
+                    "Despertar con edema palpebral matutino predominante"
+                ],
+                correcta: 1,
+                pista: "Piensa en el efecto de la gravedad tras estar de pie o sentado durante el día y el incremento de la presión hidrostática."
+            },
+            {
+                pregunta: "¿Cómo se denomina semiológicamente a la respiración caracterizada por un aumento progresivo de la profundidad y frecuencia respiratoria seguido de apneas?",
+                opciones: [
+                    "Respiración de Kussmaul",
+                    "Respiración de Biot",
+                    "Respiración de Cheyne-Stokes",
+                    "Respiración paradójica"
+                ],
+                correcta: 2,
+                pista: "Es muy típica de la insuficiencia cardíaca congestiva severa y daño del sistema nervioso central."
+            },
+            {
+                pregunta: "¿Qué signo semiológico indica la presencia de ascitis mediante la percepción de una onda líquida al golpear un flanco abdominal?",
+                opciones: [
+                    "Signo del tmpano",
+                    "Signo de la ola o temblor abdominal",
+                    "Signo de Murphy",
+                    "Signo de Blumberg"
+                ],
+                correcta: 1,
+                pista: "Requiere la ayuda de la mano del propio paciente o de un ayudante en la línea media para bloquear la transmisión por la pared."
+            },
+            {
+                pregunta: "¿Cuál es la característica principal del dolor torácico de origen isquémico (angina típica)?",
+                opciones: [
+                    "Punzante, localizado en punta de dedo y dura segundos",
+                    "Opresivo, retroesternal, irradiado a cuello/mandíbula/brazo izquierdo y gatillado por esfuerzo",
+                    "Quemante, asociado estrictamente con la deglución",
+                    "Constrictivo en hemicinturón que empeora con la inspiración profunda"
+                ],
+                correcta: 1,
+                pista: "Busca la clásica descripción de 'puño cerrado sobre el esternón' (Signo de Levine)."
+            },
+            {
+                pregunta: "¿Qué patología sugiere el hallazgo semiológico de cianosis central combinada con acropaquia (dedos en palillo de tambor)?",
+                opciones: [
+                    "Insuficiencia cardíaca descompensada aguda",
+                    "Cardiopatía congénita cianógena crónica",
+                    "Crisis asmática severa",
+                    "Tromboembolismo pulmonar masivo"
+                ],
+                correcta: 1,
+                pista: "La hipoxia crónica tisular estimula factores de crecimiento vascular periférico a lo largo de los años."
+            }
+        ];
+
+        const premios = [
+            "10 pts - Estudiante",
+            "50 pts - Interno",
+            "100 pts - Residente",
+            "500 pts - Especialista",
+            "1.000 pts - Maestro de la Semiología 🏆"
+        ];
+
+        let indiceActual = 0;
+        let comodin50Usado = false;
+
+        const questionText = document.getElementById("question-text");
+        const optionsContainer = document.getElementById("options-container");
+        const questionNumber = document.getElementById("question-number");
+        const prizeList = document.getElementById("prize-list");
+        const gameStatus = document.getElementById("game-status");
+
+        function inicializarJuego() {
+            indiceActual = 0;
+            comodin50Usado = false;
+            document.getElementById("btn-50").disabled = false;
+            document.getElementById("btn-pista").disabled = false;
+            renderizarPremios();
+            cargarPregunta();
+        }
+
+        function renderizarPremios() {
+            prizeList.innerHTML = "";
+            premios.forEach((premio, idx) => {
+                const li = document.createElement("li");
+                li.className = `p-2 rounded-lg text-center font-medium transition ${idx === indiceActual ? 'bg-purple-600 text-white font-bold shadow-lg' : idx < indiceActual ? 'text-slate-500 line-through' : 'text-slate-400 bg-slate-900/50'}`;
+                li.innerText = premio;
+                prizeList.appendChild(li);
+            });
+        }
+
+        function cargarPregunta() {
+            gameStatus.innerText = "";
+            if (indiceActual >= preguntas.length) {
+                questionText.innerText = "¡Increíble! Has dominado todas las estaciones semiológicas con éxito absoluto. 🩺✨";
+                optionsContainer.innerHTML = `<button onclick="inicializarJuego()" class="col-span-2 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold transition shadow-lg">Jugar de Nuevo</button>`;
+                questionNumber.innerText = "¡Juego Completado!";
+                return;
+            }
+
+            const actual = preguntas[indiceActual];
+            questionNumber.innerText = `Pregunta ${indiceActual + 1} de ${preguntas.length}`;
+            questionText.innerText = actual.pregunta;
+            optionsContainer.innerHTML = "";
+
+            actual.opciones.forEach((opcion, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn p-4 bg-slate-800/80 border border-slate-700 rounded-xl text-left text-sm font-medium hover:bg-slate-700/80 transition flex items-center gap-3";
+                btn.innerHTML = `<span class="text-purple-400 font-bold">${String.fromCharCode(65 + idx)}.</span> ${opcion}`;
+                btn.onclick = () => verificarRespuesta(idx, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            renderizarPremios();
+        }
+
+        function verificarRespuesta(seleccionada, boton) {
+            const actual = preguntas[indiceActual];
+            const botones = optionsContainer.querySelectorAll("button");
+            
+            botones.forEach(b => b.disabled = true);
+
+            if (seleccionada === actual.correcta) {
+                boton.classList.remove("bg-slate-800/80", "border-slate-700");
+                boton.classList.add("bg-emerald-600/90", "border-emerald-500", "text-white");
+                gameStatus.innerText = "¡Respuesta correcta! Avanzando...";
+                
+                setTimeout(() => {
+                    indiceActual++;
+                    cargarPregunta();
+                }, 1500);
+            } else {
+                boton.classList.remove("bg-slate-800/80", "border-slate-700");
+                boton.classList.add("bg-rose-600/90", "border-rose-500", "text-white");
+                
+                // Mostrar la correcta
+                botones[actual.correcta].classList.remove("bg-slate-800/80", "border-slate-700");
+                botones[actual.correcta].classList.add("bg-emerald-600/90", "border-emerald-500", "text-white");
+                
+                gameStatus.innerText = "¡Ops! Respuesta incorrecta. Inténtalo de nuevo.";
+                
+                setTimeout(() => {
+                    inicializarJuego();
+                }, 3000);
+            }
+        }
+
+        function usarComodín50() {
+            if (comodin50Usado) return;
+            comodin50Usado = true;
+            document.getElementById("btn-50").disabled = true;
+            document.getElementById("btn-50").classList.add("opacity-50");
+
+            const actual = preguntas[indiceActual];
+            const botones = Array.from(optionsContainer.querySelectorAll("button"));
+            
+            let eliminadas = 0;
+            botones.forEach((btn, idx) => {
+                if (idx !== actual.correcta && eliminadas < 2) {
+                    btn.style.opacity = "0.2";
+                    btn.disabled = true;
+                    eliminadas++;
+                }
+            });
+        }
+
+        function usarComodínPista() {
+            document.getElementById("btn-pista").disabled = true;
+            document.getElementById("btn-pista").classList.add("opacity-50");
+            const actual = preguntas[indiceActual];
+            alert(`💡 Pista del caso clínico:\n\n${actual.pista}`);
+        }
+
+        // Iniciar juego al cargar
+        window.onload = inicializarJuego;
+    </script>
+</body>
+</html>
